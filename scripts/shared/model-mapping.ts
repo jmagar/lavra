@@ -57,7 +57,21 @@ export const MODEL_TIERS = {
     opus: modelConfig.cortex?.opus ?? "opus",
     inherit: "inherit",
   },
+  codex: {
+    haiku: modelConfig.codex?.haiku ?? "gpt-5.4-mini",
+    sonnet: modelConfig.codex?.sonnet ?? "gpt-5.4",
+    opus: modelConfig.codex?.opus ?? "gpt-5.4",
+    inherit: "inherit",
+  },
 } as const;
+
+/** Reasoning effort mapping for Codex (sonnet=low, opus=high) */
+export const CODEX_REASONING: Record<string, string | undefined> = {
+  haiku: undefined,
+  sonnet: modelConfig.codex?.sonnet_reasoning ?? "low",
+  opus: modelConfig.codex?.opus_reasoning ?? "high",
+  inherit: undefined,
+};
 
 /**
  * Maps a Claude Code model tier to OpenCode model ID
@@ -104,6 +118,40 @@ export function mapToGemini(claudeModel: string): string {
 
   // Default to gemini-2.5-pro if unknown
   return "gemini-2.5-pro";
+}
+
+/**
+ * Maps a Claude Code model tier to Cortex Code model tier
+ * Identity mapping: Cortex uses the same tier names as Claude
+ */
+/**
+ * Maps a Claude Code model tier to Codex model ID
+ */
+export function mapToCodex(claudeModel: string): string {
+  const model = claudeModel.toLowerCase();
+
+  if (model === "inherit") {
+    return "inherit";
+  }
+
+  if (model.startsWith("gpt-")) {
+    return claudeModel;
+  }
+
+  const tier = model as keyof typeof MODEL_TIERS.codex;
+  if (tier in MODEL_TIERS.codex) {
+    return MODEL_TIERS.codex[tier];
+  }
+
+  return "gpt-5.4";
+}
+
+/**
+ * Returns the reasoning effort for a Codex model tier, or undefined if not applicable
+ */
+export function codexReasoningEffort(claudeModel: string): string | undefined {
+  const model = claudeModel.toLowerCase();
+  return CODEX_REASONING[model];
 }
 
 /**
