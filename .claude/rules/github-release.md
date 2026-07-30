@@ -235,9 +235,7 @@ bash scripts/build-memory-sanitize-helper.sh
 ls dist/memorysanitize/
 # Must contain:
 #   memory-sanitize-darwin-amd64
-#   memory-sanitize-darwin-arm64
 #   memory-sanitize-linux-amd64
-#   memory-sanitize-linux-arm64
 #   SHA256SUMS.txt
 ```
 

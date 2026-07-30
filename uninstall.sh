@@ -130,4 +130,6 @@ fi
 echo "🔄 Uninstalling lavra for $PLATFORM..."
 echo ""
 
+# The platform-specific uninstaller is selected from a fixed internal path above.
+# shellcheck disable=SC1090
 source "$UNINSTALLER" "$@"

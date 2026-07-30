@@ -134,4 +134,6 @@ export BEADS_MARKETPLACE_ROOT="$SCRIPT_DIR"
 echo "Installing lavra for $PLATFORM..."
 echo ""
 
+# The platform-specific installer is selected from a fixed internal path above.
+# shellcheck disable=SC1090
 source "$INSTALLER" "$@"

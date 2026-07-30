@@ -1,0 +1,161 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions: {}
+
+concurrency:
+  group: lavra-release-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  context:
+    name: Resolve release identity
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+      - id: release
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          version="${TAG#v}"
+          test -n "$version"
+          test "$(jq -r '.version' package.json)" = "$version"
+          test "$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)" = "$version"
+          if jq -e 'has("version")' plugins/lavra/.claude-plugin/plugin.json >/dev/null; then
+            echo "plugin manifest must not contain a version field" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  verify:
+    name: Release readiness
+    needs: context
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.6"
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: "1.26.1"
+          cache: false
+      - run: bash scripts/pre-release-check.sh
+
+  installation:
+    name: macOS installation
+    needs: context
+    runs-on: macos-15-intel
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: "1.3.6"
+      - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
+        with:
+          go-version: "1.26.1"
+          cache: false
+      - run: (command -v bd >/dev/null || brew install beads)
+      - run: (cd scripts && bun install --frozen-lockfile)
+      - run: bash scripts/test-installation.sh
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: installation-test-logs
+          path: /tmp/beads-install-test-*/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  npx-installer:
+    name: macOS npx installer
+    needs: context
+    runs-on: macos-15-intel
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: (command -v bd >/dev/null || brew install beads)
+      - name: Test installer
+        run: |
+          set -euo pipefail
+          node bin/install.js --help
+          target="$(mktemp -d)"
+          trap 'rm -rf "$target"' EXIT
+          cd "$target"
+          git init -q
+          if node "$GITHUB_WORKSPACE/bin/install.js" --claude --yes 2>&1; then
+            echo "installer unexpectedly accepted a repository without beads" >&2
+            exit 1
+          fi
+          bd init -q
+          node "$GITHUB_WORKSPACE/bin/install.js" --claude --yes
+          test -d .claude/hooks
+          test -d .claude/commands
+          test -d .claude/agents
+
+  pages:
+    needs: verify
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: dinglebear-ai/workflows/.github/workflows/pages-deploy.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    with:
+      checkout-ref: ${{ github.event.release.tag_name }}
+      node-version: "22"
+      package-cache: npm
+      working-directory: site
+      cache-dependency-path: package-lock.json
+      install-command: npm install --global bun@1.3.6 && bun install --frozen-lockfile
+      build-command: bun run build
+      artifact-path: site/dist
+
+  publish:
+    needs: [context, verify, installation, npx-installer]
+    permissions:
+      contents: read
+      id-token: write
+    uses: dinglebear-ai/workflows/.github/workflows/npm-trusted-publish.yml@eb5f36cf517ffc949aca1c81e2ccbc71b5a85267
+    with:
+      checkout-ref: ${{ github.event.release.tag_name }}
+      expected-version: ${{ needs.context.outputs.version }}
+      node-version: "22"
+      cache-dependency-path: package-lock.json
+      install-command: npm ci --ignore-scripts --no-audit --no-fund
+      verify-command: node bin/install.js --help
+      access: public

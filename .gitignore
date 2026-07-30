@@ -8,7 +8,6 @@ __pycache__
 tasks/
 
 # Beads (ephemeral task data)
-.mcp.json
 plans/
 
 # Build artifacts (generated at install time)
@@ -21,9 +20,14 @@ plugins/lavra/cortex/
 *.db
 
 # Lavra runtime data (this project's own .lavra/ install)
-.lavra/
-!.lavra/config/
-!.lavra/config/**
 
 # Beads / Dolt files (added by bd init)
 .beads-credential-key
+
+# Tracked repository contracts override user-level ignore rules.
+!.beads/
+!.beads/**
+.lavra/
+!plugins/lavra/.mcp.json
+!site/.vscode/
+!site/.vscode/**

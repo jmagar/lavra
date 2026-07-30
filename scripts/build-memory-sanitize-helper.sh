@@ -13,9 +13,7 @@ rm -f "$OUT_DIR"/memory-sanitize-* "$OUT_DIR"/SHA256SUMS.txt
 
 TARGETS=(
   "darwin amd64"
-  "darwin arm64"
   "linux amd64"
-  "linux arm64"
 )
 
 for target in "${TARGETS[@]}"; do

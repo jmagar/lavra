@@ -35,22 +35,25 @@ fail() {
 echo ""
 echo "=== Version consistency ==="
 
-PLUGIN_VERSION=$(jq -r '.version' plugins/lavra/.claude-plugin/plugin.json)
 MARKETPLACE_VERSION=$(jq -r '.plugins[] | select(.name == "lavra") | .version' .claude-plugin/marketplace.json)
 NPM_VERSION=$(jq -r '.version' package.json)
 
-echo "  plugin.json:      $PLUGIN_VERSION"
 echo "  marketplace.json: $MARKETPLACE_VERSION"
 echo "  package.json:     $NPM_VERSION"
 
-if [[ "$PLUGIN_VERSION" == "$MARKETPLACE_VERSION" ]]; then
+if [[ "$NPM_VERSION" == "$MARKETPLACE_VERSION" ]]; then
   echo "  PASS  Versions match"
   ((PASS++)) || true
 else
-  fail "Version mismatch" "plugin.json=$PLUGIN_VERSION marketplace.json=$MARKETPLACE_VERSION"
+  fail "Version mismatch" "package.json=$NPM_VERSION marketplace.json=$MARKETPLACE_VERSION"
 fi
 
-[[ "$NPM_VERSION" == "$PLUGIN_VERSION" ]] && { echo "  PASS  package.json version"; ((PASS++)) || true; } || fail "package.json version" "has $NPM_VERSION, expected $PLUGIN_VERSION"
+if jq -e 'has("version")' plugins/lavra/.claude-plugin/plugin.json >/dev/null; then
+  fail "Plugin manifest identity" "plugin.json must not contain a version field"
+else
+  echo "  PASS  plugin.json uses package and Git identity"
+  ((PASS++)) || true
+fi
 
 echo ""
 echo "=== Hook version constants ==="
@@ -61,8 +64,8 @@ PROVISION_VERSION=$(grep 'echo "' plugins/lavra/hooks/provision-memory.sh | grep
 echo "  auto-recall.sh:       $HOOK_VERSION"
 echo "  provision-memory.sh:  $PROVISION_VERSION"
 
-[[ "$HOOK_VERSION" == "$PLUGIN_VERSION" ]] && { echo "  PASS  auto-recall.sh version"; ((PASS++)) || true; } || fail "auto-recall.sh version" "has $HOOK_VERSION, expected $PLUGIN_VERSION"
-[[ "$PROVISION_VERSION" == "$PLUGIN_VERSION" ]] && { echo "  PASS  provision-memory.sh version"; ((PASS++)) || true; } || fail "provision-memory.sh version" "has $PROVISION_VERSION, expected $PLUGIN_VERSION"
+[[ "$HOOK_VERSION" == "$NPM_VERSION" ]] && { echo "  PASS  auto-recall.sh version"; ((PASS++)) || true; } || fail "auto-recall.sh version" "has $HOOK_VERSION, expected $NPM_VERSION"
+[[ "$PROVISION_VERSION" == "$NPM_VERSION" ]] && { echo "  PASS  provision-memory.sh version"; ((PASS++)) || true; } || fail "provision-memory.sh version" "has $PROVISION_VERSION, expected $NPM_VERSION"
 
 echo ""
 echo "=== Conversion outputs ==="

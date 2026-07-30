@@ -35,7 +35,7 @@ lavra/                              # Marketplace root
 ├── plugins/
 │   └── lavra/                      # Plugin root
 │       ├── .claude-plugin/
-│       │   └── plugin.json         # Plugin manifest (v0.7.0)
+│       │   └── plugin.json         # Plugin manifest (no version field)
 │       ├── agents/                 # agents (review/, research/, design/, workflow/, docs/)
 │       ├── commands/               # core commands + optional/
 │       ├── skills/                 # skills (core + optional) with supporting files
