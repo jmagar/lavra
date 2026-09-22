@@ -88,9 +88,29 @@ Anyone using coding agents who wants consistent, high-quality output instead of 
 
 ## Install
 
-**Requires:** [beads CLI](https://github.com/steveyegge/beads), `jq`, `sqlite3`
+Lavra needs `jq`, `sqlite3`, and the [Beads CLI](https://github.com/gastownhall/beads). Install Beads once, install Lavra for each coding agent you use, then initialize Beads in each project.
 
-Clone this fork and run both installers to use Lavra globally with Claude Code and Codex. The installer accepts one runtime per invocation:
+### 1. Install Beads
+
+Use Homebrew on macOS or Linux:
+
+```bash
+brew install beads
+bd version
+```
+
+Alternatively, use the [official Beads install script](https://github.com/gastownhall/beads/blob/main/docs/getting-started/installation.md):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/gastownhall/beads/main/scripts/install.sh | bash
+bd version
+```
+
+See the [Beads installation guide](https://github.com/gastownhall/beads/blob/main/docs/getting-started/installation.md) for other platforms and methods. Install `jq` and `sqlite3` with your system's package manager if they are not already available.
+
+### 2. Install Lavra
+
+Clone this fork. Run both commands to use Lavra globally with Claude Code and Codex; the installer accepts one runtime per invocation:
 
 ```bash
 git clone https://github.com/jmagar/lavra.git
@@ -99,18 +119,18 @@ cd lavra
 ./install.sh --codex --global  # ~/.codex/
 ```
 
-For a Codex project install, run `bash /path/to/lavra/install.sh --codex` from that project's root. For Claude Code, pass the project path explicitly: `bash /path/to/lavra/install.sh --claude /path/to/your-project`.
+For a project-only install, run `bash /path/to/lavra/install.sh --codex` from the project's root. For Claude Code, pass the project path explicitly: `bash /path/to/lavra/install.sh --claude /path/to/your-project`.
 
-Lavra also needs [Beads](https://github.com/steveyegge/beads) initialized in each project where you want task tracking and memory. Install the `bd` CLI once, then run:
+### 3. Initialize each project
+
+Global installation makes Lavra available to your coding agents, but task tracking and memory require Beads in each project. From the project root, run:
 
 ```bash
 cd /path/to/your-project
 bd init
 ```
 
-The Lavra global install does not initialize Beads in every project. See the [Beads installation guide](https://github.com/steveyegge/beads#installation) for CLI installation options.
-
-For OpenCode, Gemini CLI, or Cortex Code, use `./install.sh --opencode`, `./install.sh --gemini`, or `./install.sh --cortex` from the checkout.
+Existing Beads projects do not need to be initialized again. For OpenCode, Gemini CLI, or Cortex Code, use `./install.sh --opencode`, `./install.sh --gemini`, or `./install.sh --cortex` from the Lavra checkout.
 
 <details>
 <summary><strong>All commands</strong></summary>
