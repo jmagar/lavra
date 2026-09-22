@@ -94,16 +94,34 @@ Anyone using coding agents who wants consistent, high-quality output instead of 
 npx @lavralabs/lavra@latest
 ```
 
+To install globally for both Claude Code and Codex, run both commands (the installer accepts one runtime per invocation):
+
+```bash
+npx @lavralabs/lavra@latest --claude --global # ~/.claude/
+npx @lavralabs/lavra@latest --codex --global  # ~/.codex/
+```
+
+The npm commands use the published package, which may lag behind this repository. To install the Codex support in [this fork's main branch](https://github.com/jmagar/lavra/tree/main) now, clone the fork and run `bash /path/to/lavra/install.sh --codex --global`. Run it from a project directory without `--global` for a project install.
+
+Lavra also needs [Beads](https://github.com/steveyegge/beads) initialized in each project where you want task tracking and memory. Install the `bd` CLI once, then run:
+
+```bash
+cd /path/to/your-project
+bd init
+```
+
+The Lavra global install does not initialize Beads in every project. See the [Beads installation guide](https://github.com/steveyegge/beads#installation) for CLI installation options.
+
 Or manual:
 
 ```bash
-git clone https://github.com/roberto-mello/lavra.git
+git clone https://github.com/jmagar/lavra.git
 cd lavra
-./install.sh               # Claude Code (default)
+./install.sh --claude --global # Claude Code
+./install.sh --codex --global  # Codex
 ./install.sh --opencode    # OpenCode
 ./install.sh --gemini      # Gemini CLI
 ./install.sh --cortex      # Cortex Code
-./install.sh --codex       # Codex
 ```
 
 <details>
