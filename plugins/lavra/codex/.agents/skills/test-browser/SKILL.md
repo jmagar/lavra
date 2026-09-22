@@ -99,7 +99,7 @@ If installation fails, inform the user and stop.
 
 Ask user if they want to watch the browser:
 
-Use AskUserQuestion:
+Use a user question:
 - Question: "Do you want to watch the browser tests run?"
 - Options:
   1. **Headed (watch)** - Opens visible browser window so you can see tests run
@@ -208,7 +208,7 @@ Pause for human input when testing touches:
 | SMS | "Verify you received the SMS code" |
 | External APIs | "Confirm the [service] integration is working" |
 
-Use AskUserQuestion:
+Use a user question:
 ```markdown
 **Human Verification Needed**
 
@@ -294,7 +294,7 @@ Present summary after all tests complete:
 </success_criteria>
 
 <handoff>
-1. **Run `/lavra-review`** - Full code review of the changes
+1. **Run `$lavra-review`** - Full code review of the changes
 2. **Fix failures** - Address test failures now
 3. **Done** - Accept results
 </handoff>

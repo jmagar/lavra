@@ -240,7 +240,7 @@ This is the lavra differentiator. Read and analyze knowledge base.
 
    Cross-reference: for each hotspot file (Phase 2) and closed bead (Phase 3), check for knowledge entries referencing them. Significant activity + zero entries = gap.
 
-   Report with recommendation: "Consider running /lavra-compound on {bead} to capture what was learned."
+   Report with recommendation: "Consider running $lavra-compound on {bead} to capture what was learned."
 
 6. **Trend comparison**
 
@@ -380,18 +380,18 @@ Always save snapshot, even first retro. Future retros depend on historical data.
 </guardrails>
 
 <handoff>
-After presenting report, use **AskUserQuestion tool**:
+After presenting report, use **available Codex user-input interface**:
 
 **Question:** "Retro complete for the last {N} days. What would you like to do next?"
 
 **Options:**
-1. **Plan action items** — Run `/lavra-plan` on action items above to create structured beads with research and sub-tasks
-2. **`/lavra-learn`** — Curate raw knowledge comments surfaced this week into structured entries
-3. **`/lavra-triage`** — Triage backlog: review deferred and open beads, decide what to carry forward, dismiss, or reprioritize (run in new message)
+1. **Plan action items** — Run `$lavra-plan` on action items above to create structured beads with research and sub-tasks
+2. **`$lavra-learn`** — Curate raw knowledge comments surfaced this week into structured entries
+3. **`$lavra-triage`** — Triage backlog: review deferred and open beads, decide what to carry forward, dismiss, or reprioritize (run in new message)
 4. **Done** — Close out session
 
 If user picks option 1, extract action items from `## Action Items` section and invoke:
 ```
-Skill("lavra-plan", args="{action items summary}")
+$lavra-plan with args="{action items summary}"
 ```
 </handoff>

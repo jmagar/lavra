@@ -113,6 +113,10 @@ cp -R "$GENERATED_CODEX" "$OUTPUT_DIR/.codex"
 mkdir -p "$OUTPUT_DIR/.agents"
 cp -R "$GENERATED_SKILLS" "$OUTPUT_DIR/.agents/skills"
 
+# APM handles routing; Codex-native overlays preserve provider semantics that
+# its Claude converter cannot express (workflow APIs, hooks, agent policies).
+python3 "$REPO_ROOT/scripts/codex-postprocess.py" "$OUTPUT_DIR"
+
 agent_count="$(find "$OUTPUT_DIR/.codex/agents" -type f -name '*.toml' | wc -l | tr -d ' ')"
 skill_count="$(find "$OUTPUT_DIR/.agents/skills" -type f -name 'SKILL.md' | wc -l | tr -d ' ')"
 hook_script_count="$(find "$OUTPUT_DIR/.codex/hooks" -type f | wc -l | tr -d ' ')"
@@ -131,4 +135,4 @@ echo "Built Codex artifacts with $(apm --version | head -n 1):"
 echo "  Agents: $agent_count"
 echo "  Skills: $skill_count"
 echo "  Hook files: $hook_script_count"
-echo "  Known limitation: $EXPECTED_LOSSY_AGENT cannot retain its Claude tool allowlist."
+echo "  Every style editor is read-only in Codex because APM cannot preserve its Claude tool allowlist."

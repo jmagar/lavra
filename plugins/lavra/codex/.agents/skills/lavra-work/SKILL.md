@@ -9,7 +9,7 @@ metadata:
 ---
 
 <objective>
-Execute work on beads efficiently while maintaining quality and finishing features. Auto-routes between single-bead direct execution, sequential epic execution (token-efficient), and multi-bead parallel dispatch based on input. For autonomous retry, use `/lavra-work-ralph`. For persistent worker teams, use `/lavra-work-teams`.
+Execute work on beads efficiently while maintaining quality and finishing features. Auto-routes between single-bead direct execution, sequential epic execution (token-efficient), and multi-bead parallel dispatch based on input. For autonomous retry, use `$lavra-work-ralph`. For persistent worker teams, use `$lavra-work-teams`.
 </objective>
 
 <execution_context>
@@ -68,7 +68,7 @@ bd list --parent {EPIC_ID} --status=open --json
 ```bash
 bd ready --json
 ```
-- If 0 beads: inform user "No ready beads found. Use /lavra-design to plan new work or bd create to add a bead." Exit.
+- If 0 beads: inform user "No ready beads found. Use $lavra-design to plan new work or bd create to add a bead." Exit.
 - If 1 bead: Route = SINGLE (with that bead)
 - If N > 1 beads: Route = MULTI_CANDIDATE
 
@@ -94,9 +94,9 @@ Ask the user:
 
 After determining Route in Phase 0c/0d:
 
-- **SINGLE:** `Skill("lavra-work-single")`
+- **SINGLE:** `$lavra-work-single`
 - **SEQUENTIAL:** Sequential Epic Loop (see below)
-- **MULTI:** `Skill("lavra-work-multi")`
+- **MULTI:** `$lavra-work-multi`
 
 ---
 
@@ -128,10 +128,10 @@ Extract `## Locked Decisions`, `## Agent Discretion`, and `## Deferred` sections
 For each bead in `{SEQUENTIAL_BEAD_LIST}`:
 
 ```
-Skill("lavra-work-single", "{BEAD_ID} --skip-review EPIC_PLAN={EPIC_PLAN}")
+$lavra-work-single with "{BEAD_ID} --skip-review EPIC_PLAN={EPIC_PLAN}"
 ```
 
-The `--skip-review` flag tells `lavra-work-single` to skip its internal `/lavra-review` call. Self-review (Phase 3 step 2) still runs. Review happens once at the end of the loop.
+The `--skip-review` flag tells `lavra-work-single` to skip its internal `$lavra-review` call. Self-review (Phase 3 step 2) still runs. Review happens once at the end of the loop.
 
 After each bead completes, check if it was closed. If it was not (user deferred), continue to the next bead anyway — do not block the loop.
 
@@ -162,11 +162,11 @@ PRE_WORK_SHA=$(git merge-base HEAD "origin/${DEFAULT_BRANCH}")
 ```
 
 ```
-Skill("lavra-review", "{space-separated BEAD_IDs}
+$lavra-review with "{space-separated BEAD_IDs}
 
 PRE_WORK_SHA={PRE_WORK_SHA}
 
-## Epic Plan (read-only — reviewers must not flag planned-but-incomplete items as dead code)
+## Epic Plan (read-only — reviewers must not flag planned-but-incomplete items as dead code
 {EPIC_PLAN}
 
 Locked Decisions in the epic above are intentional, even if a field or behavior appears unused or partially wired. Do not create beads recommending removal of items that appear in Locked Decisions.")
@@ -188,8 +188,8 @@ Apply inline-fix triage to findings (same rules as single-bead Fix Loop): fix P3
 - ...
 
 ### Next Steps:
-1. Address any P1 review findings: `/lavra-work {FINDING_BEAD_ID}`
-2. Open PR: `/lavra-ship`
+1. Address any P1 review findings: `$lavra-work {FINDING_BEAD_ID}`
+2. Open PR: `$lavra-ship`
 3. View filed findings: `bd list --tags "review"`
 ```
 

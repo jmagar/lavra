@@ -32,16 +32,6 @@
           }
         ]
       }
-    ],
-    "TeammateIdle": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".codex/hooks/lavra/hooks/teammate-idle-check.sh"
-          }
-        ]
-      }
     ]
   }
 }

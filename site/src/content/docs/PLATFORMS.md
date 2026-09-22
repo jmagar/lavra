@@ -1,23 +1,35 @@
 ---
 title: Platform Support
-description: Installation and setup for Claude Code, OpenCode, Gemini CLI, and Cortex Code
+description: Installation and setup for Claude Code, Codex, OpenCode, Gemini CLI, and Cortex Code
 order: 4
 ---
 
 # Multi-Platform Support
 
-Lavra supports four AI coding agents. The core memory system (hooks, knowledge capture, auto-recall) works identically across all platforms. Commands, agents, and skills are available on all platforms.
+Lavra supports Claude Code, Codex, OpenCode, Gemini CLI, and Cortex Code. Codex receives APM-generated agents and skills with Codex-specific workflow and hook overlays.
 
 ## What works where
 
-| Feature | Claude Code | OpenCode | Gemini CLI | Cortex Code |
-|---------|-------------|----------|------------|-------------|
-| Memory capture | ✓ | ✓ | ✓ | ✓ |
-| Auto-recall | ✓ | ✓ | ✓ | ✓ |
-| Commands | ✓ | ✓ | ✓ | ✓ |
-| Agents | ✓ | ✓ | ✓ | ✓ |
-| Skills | ✓ | ✓ | ✓ | ✓ |
-| Context7 MCP | ✓ | ✓ | ✓ | manual |
+| Feature | Claude Code | Codex | OpenCode | Gemini CLI | Cortex Code |
+|---------|-------------|-------|----------|------------|-------------|
+| Memory capture | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Auto-recall | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Commands as skills | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Agents | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Skills | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Context7 MCP | ✓ | ✓ | ✓ | ✓ | manual |
+
+## Codex
+
+```bash
+npx @lavralabs/lavra@latest --codex --yes           # current project
+npx @lavralabs/lavra@latest --codex --global --yes  # user scope
+npx @lavralabs/lavra@latest --codex --uninstall     # current project
+```
+
+The installer deploys 30 agent definitions to `.codex/agents/`, 45 skills to `.agents/skills/`, three supported hooks to `.codex/hooks.json`, and Context7 to `.codex/config.toml`. Codex reads a project's `.codex/config.toml` after the project is trusted. It records owned files in `.codex/lavra-install.json`; uninstall preserves user files and modified Lavra files. Codex commands are exposed as skills. The `every-style-editor` agent is read-only and provides suggested edits because Codex cannot enforce its Claude tool allowlist.
+
+For source development, install [Microsoft APM](https://microsoft.github.io/apm/) 0.31.0 and run `apm run build-codex`. The build applies native Codex overlays after APM conversion and CI rejects generated drift. A fresh install needs the beads CLI, `jq`, and `sqlite3` for the memory workflow. Restart Codex after installing so it discovers the new agents, skills, hooks, and MCP server.
 
 ## Claude Code
 

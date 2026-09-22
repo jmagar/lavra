@@ -110,16 +110,16 @@ bd backup
 
 If significant code was written this session, offer a quick code-simplicity check:
 
-Use **AskUserQuestion tool**: "Would you like a quick simplicity review of the code changes?"
+Use **available Codex user-input interface**: "Would you like a quick simplicity review of the code changes?"
 
 If yes:
-- Task code-simplicity-reviewer("Review the code changes from this session for unnecessary complexity")
+- Codex subagent code-simplicity-reviewer with ("Review the code changes from this session for unnecessary complexity")
 
 ### Step 8: Suggest Knowledge Capture
 
 If problems were solved during this session, suggest documenting them:
 
-"You captured knowledge comments this session. Want to run `/lavra-learn` to curate them into structured, well-tagged entries?"
+"You captured knowledge comments this session. Want to run `$lavra-learn` to curate them into structured, well-tagged entries?"
 
 ### Step 9: Report
 
@@ -143,7 +143,7 @@ Knowledge captured:
 Remaining in-progress:
 - BD-124: Add password reset flow (40% complete)
 
-Session continues. Use /lavra-checkpoint again to save more progress.
+Session continues. Use $lavra-checkpoint again to save more progress.
 ```
 
 </process>
@@ -164,12 +164,12 @@ Session continues. Use /lavra-checkpoint again to save more progress.
 </guardrails>
 
 <handoff>
-After the checkpoint report, use the **AskUserQuestion tool** to present next steps:
+After the checkpoint report, use the **available Codex user-input interface** to present next steps:
 
 **Question:** "Checkpoint saved. What would you like to do next?"
 
 **Options:**
-1. **Continue `/lavra-work`** - Resume implementing the current bead
-2. **Run `/lavra-review`** - Multi-agent code review on changes so far
+1. **Continue `$lavra-work`** - Resume implementing the current bead
+2. **Run `$lavra-review`** - Multi-agent code review on changes so far
 3. **Keep working** - Continue the session without a specific command
 </handoff>

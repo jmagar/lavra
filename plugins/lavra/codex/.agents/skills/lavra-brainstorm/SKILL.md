@@ -9,7 +9,7 @@ metadata:
 ---
 
 <objective>
-Brainstorm a feature or improvement through collaborative dialogue. Brainstorming answers **WHAT** to build, surfaces gray areas that need decisions, and breaks the vision into implementation phases filed as child beads. It precedes `/lavra-design`, which answers **HOW** to build each phase.
+Brainstorm a feature or improvement through collaborative dialogue. Brainstorming answers **WHAT** to build, surfaces gray areas that need decisions, and breaks the vision into implementation phases filed as child beads. It precedes `$lavra-design`, which answers **HOW** to build each phase.
 </objective>
 
 <execution_context>
@@ -84,7 +84,7 @@ Evaluate whether brainstorming is needed based on the feature description.
 - Constrained, well-defined scope
 
 **If requirements are already clear:**
-Use **AskUserQuestion tool** to suggest: "Your requirements seem detailed enough to proceed directly to planning. Should I run `/lavra-plan` instead, or would you like to explore the idea further?"
+Use **available Codex user-input interface** to suggest: "Your requirements seem detailed enough to proceed directly to planning. Should I run `$lavra-plan` instead, or would you like to explore the idea further?"
 
 ### Phase 1: Understand the Idea
 
@@ -92,7 +92,7 @@ Use **AskUserQuestion tool** to suggest: "Your requirements seem detailed enough
 
 Run a quick repo scan to understand existing patterns:
 
-- Task repo-research-analyst("Understand existing patterns related to: <feature_description>")
+- Codex subagent repo-research-analyst with ("Understand existing patterns related to: <feature_description>")
 
 Focus on: similar features, established patterns, CLAUDE.md or AGENTS.md guidance.
 
@@ -109,7 +109,7 @@ Present any relevant entries that might inform the brainstorm.
 
 #### 1.3 Collaborative Dialogue (Deep Questioning)
 
-Use the **AskUserQuestion tool** to ask questions **one at a time**. Keep asking until the picture is clear -- do not rush this phase.
+Use the **available Codex user-input interface** to ask questions **one at a time**. Keep asking until the picture is clear -- do not rush this phase.
 
 **Guidelines (see `brainstorming` skill for detailed techniques):**
 - Prefer multiple choice when natural options exist
@@ -146,7 +146,7 @@ Scan the entire conversation so far for ambiguities where reasonable developers 
 
 **2.1 Present gray areas:**
 
-Use **AskUserQuestion tool** to present a numbered list:
+Use **available Codex user-input interface** to present a numbered list:
 
 "Before we explore approaches, I see these areas where we need a decision:
 
@@ -158,7 +158,7 @@ Which would you like to discuss? (Pick numbers, or 'all', or 'skip' if none matt
 
 **2.2 Explore selected gray areas:**
 
-For each selected gray area, ask 3-4 targeted questions using **AskUserQuestion tool** (one at a time) to drive toward a decision.
+For each selected gray area, ask 3-4 targeted questions using **available Codex user-input interface** (one at a time) to drive toward a decision.
 
 **2.3 Capture decisions immediately:**
 
@@ -181,7 +181,7 @@ For each approach, provide:
 
 Lead with your recommendation and explain why. Apply YAGNI -- prefer simpler solutions.
 
-Use **AskUserQuestion tool** to ask which approach the user prefers.
+Use **available Codex user-input interface** to ask which approach the user prefers.
 
 ### Phase 4: Phase Identification
 
@@ -189,7 +189,7 @@ Based on requirements, decisions, and the chosen approach, identify logical impl
 
 **4.1 Present phases:**
 
-Use **AskUserQuestion tool** to present the proposed phases:
+Use **available Codex user-input interface** to present the proposed phases:
 
 "Based on our discussion, here are the implementation phases I'd suggest:
 
@@ -320,11 +320,11 @@ Review the full conversation -- vision, requirements, phases, and locked decisio
 - **HOLD SCOPE**: Check if the plan touches >8 files or introduces >2 new classes/services. If yes, challenge whether the goal can be achieved with fewer moving parts. Identify the minimum change set.
 - **SCOPE REDUCTION**: Identify the absolute minimum that ships core value. Explicitly list what becomes a follow-up.
 
-Use **AskUserQuestion tool** to present your recommendation with a brief rationale (2-3 sentences) and let the user confirm or pick a different mode.
+Use **available Codex user-input interface** to present your recommendation with a brief rationale (2-3 sentences) and let the user confirm or pick a different mode.
 
 **6.2 Force the hard questions:**
 
-Based on the chosen mode, ask these questions using **AskUserQuestion tool** (one at a time):
+Based on the chosen mode, ask these questions using **available Codex user-input interface** (one at a time):
 
 1. "What is the smallest version that proves this works?"
 2. "What can we defer without losing the core value?"
@@ -355,12 +355,12 @@ bd comments add {EPIC_BEAD_ID} "DECISION: Deferred {item} -- not needed for MVP.
 
 ### Phase 7: Handoff
 
-Use **AskUserQuestion tool** to present next steps:
+Use **available Codex user-input interface** to present next steps:
 
 **Question:** "Brainstorm captured as {EPIC_BEAD_ID} with {N} phases filed as child beads. What would you like to do next?"
 
 **Options:**
-1. **Proceed to design** -- invoke Skill("lavra-design") with the epic bead ID to design all phases
+1. **Proceed to design** -- invoke $lavra-design with the epic bead ID to design all phases
 2. **Refine further** -- Continue exploring
 3. **Done for now** -- Return later
 
@@ -376,7 +376,7 @@ Use **AskUserQuestion tool** to present next steps:
 - Scope was sharpened: expansion/hold/reduction mode chosen, hard questions answered, phases adjusted if needed
 - Scope decisions logged as DECISION comments
 - Additional knowledge logged as INVESTIGATION/FACT/PATTERN comments
-- User was offered clear next steps (with `/lavra-design` as primary option)
+- User was offered clear next steps (with `$lavra-design` as primary option)
 </success_criteria>
 
 <guardrails>
@@ -404,6 +404,6 @@ Locked decisions:
 
 Knowledge captured: {count} entries logged to knowledge.jsonl
 
-Next: Run `/lavra-design {EPIC_BEAD_ID}` to design all phases.
+Next: Run `$lavra-design {EPIC_BEAD_ID}` to design all phases.
 ```
 </handoff>

@@ -261,5 +261,5 @@ echo "Video retained at: tmp/videos/feature-demo.gif"
 <handoff>
 - Review the video to ensure it accurately demonstrates the feature
 - Share with reviewers for context
-- Run `/lavra-review` for a full code review of the changes
+- Run `$lavra-review` for a full code review of the changes
 </handoff>

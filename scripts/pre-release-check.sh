@@ -71,6 +71,16 @@ echo "  Generating OpenCode and Gemini outputs..."
   fail "Conversion scripts" "bun run failed"
 }
 
+echo "  Generating Codex output with APM 0.31.0..."
+if ! command -v apm >/dev/null 2>&1 || ! apm --version | grep -q '0.31.0'; then
+  fail "Codex APM version" "Install apm-cli==0.31.0"
+else
+  apm run build-codex || fail "Codex APM build" "apm run build-codex failed"
+  git diff --exit-code -- plugins/lavra/codex >/dev/null || fail "Codex generated drift" "Commit the rebuilt Codex output"
+  node scripts/test-codex-install.cjs || fail "Codex install" "Install or uninstall smoke test failed"
+  node scripts/test-codex-package.cjs || fail "Codex npm package" "Packed artifact failed to install"
+fi
+
 echo ""
 echo "=== Component counts ==="
 

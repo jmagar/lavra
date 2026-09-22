@@ -13,7 +13,7 @@ Report bugs encountered while using the Lavra plugin by gathering structured inf
 
 ## Step 1: Gather Bug Information
 
-Use the AskUserQuestion tool to collect the following information:
+Use the available Codex user-input interface to collect the following information:
 
 **Question 1: Bug Category**
 - What type of issue are you experiencing?

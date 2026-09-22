@@ -36,7 +36,7 @@ PROJECT_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}"
 # If neither .beads/ nor .lavra/ exists, this project doesn't use lavra
 if [[ ! -d "$PROJECT_DIR/.beads" ]] && [[ ! -d "$PROJECT_DIR/.lavra" ]]; then
   jq -cn --arg msg "## Beads Not Initialized\n\nThis project doesn't have beads set up yet. Run \`bd init\` to enable issue tracking and knowledge management." \
-    '{"hookSpecificOutput":{"systemMessage":$msg}}'
+    '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$msg}}'
   exit 0
 fi
 
@@ -46,7 +46,7 @@ if [[ ! -d "$PROJECT_DIR/.lavra/memory" ]]; then
   provision_memory_dir "$PROJECT_DIR" "$SCRIPT_DIR"
 
   jq -cn --arg msg "## Memory System Bootstrapped\n\nAuto-created \`.lavra/memory/\` with knowledge tracking. Your discoveries will be captured automatically via beads comments.\n\nUse \`bd comments add <BEAD_ID> \"LEARNED: ...\"\` to log knowledge." \
-    '{"hookSpecificOutput":{"systemMessage":$msg}}'
+    '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$msg}}'
   exit 0
 fi
 
@@ -57,7 +57,7 @@ GITIGNORE="$PROJECT_DIR/.gitignore"
 if [[ -f "$GITIGNORE" ]] && grep -qE '^\s*\.lavra/?(\s|$)' "$GITIGNORE" 2>/dev/null &&
   ! grep -qE '^\s*!\.lavra/' "$GITIGNORE" 2>/dev/null; then
   jq -cn --arg msg "## Warning: Lavra Data Not Tracked by Git\n\nYour \`.gitignore\` contains \`.lavra/\`, which means your Lavra knowledge and config are **not committed to git**. If you lose your local copy, this data will be permanently lost.\n\nTo fix: re-run the installer interactively:\n\`\`\`\nnpx lavra@latest\n\`\`\`\nOr manually remove \`.lavra/\` from \`.gitignore\`, then \`git add .lavra/\`.\n\nIf you intentionally want \`.lavra/\` invisible to collaborators, store the ignore in \`.git/info/exclude\` instead (keeps data safe)." \
-    '{"hookSpecificOutput":{"systemMessage":$msg}}'
+    '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$msg}}'
   exit 0
 fi
 
@@ -76,7 +76,7 @@ if [[ -f "$VERSION_FILE" ]]; then
     jq -cn \
       --arg old "$INSTALLED_VERSION" \
       --arg new "$LAVRA_VERSION" \
-      '{"hookSpecificOutput":{"systemMessage":("## lavra updated (" + $old + " -> " + $new + ")\n\nAuto-provisioned new config files. Changes:\n- `.lavra/config/lavra.json` -- workflow configuration (toggle research, review, goal verification)\n- `.lavra/.gitignore` -- updated for session state\n\nFor a full upgrade (hooks, commands, agents), re-run the installer:\n```\nnpx lavra@latest\n```")}}'
+      '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":("## lavra updated (" + $old + " -> " + $new + ")\n\nAuto-provisioned new config files. Changes:\n- `.lavra/config/lavra.json` -- workflow configuration (toggle research, review, goal verification)\n- `.lavra/.gitignore` -- updated for session state\n\nFor a full upgrade (hooks, commands, agents), re-run the installer:\n```\nnpx lavra@latest\n```")}}'
     exit 0
   fi
 fi
@@ -109,7 +109,7 @@ fi
 # First-run detection: if knowledge file is empty or missing, show orientation
 if [ ! -f "$KNOWLEDGE_FILE" ] || [ ! -s "$KNOWLEDGE_FILE" ]; then
   jq -cn --arg msg "## Lavra is ready.\n\n| Goal | Command |\n|------|---------|\n| New feature | \`/lavra-brainstorm \"describe your feature\"\` |\n| Plan from spec | \`/lavra-design \"feature description\"\` |\n| Existing beads | \`/lavra-work\` |\n| Explore ideas | \`/lavra-brainstorm \"your idea\"\` |\n\nKnowledge you capture will appear here automatically in future sessions.\n\n**Memory convention:** Use \`bd comments add {BEAD_ID} \"LEARNED: ...\"\` to log knowledge — not \`bd remember\`. Comments feed \`auto-recall.sh\` and surface automatically next session." \
-    '{"hookSpecificOutput":{"systemMessage":$msg}}'
+    '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$msg}}'
   exit 0
 fi
 
@@ -227,7 +227,7 @@ fi
 
 # Output combined message using jq for safe JSON assembly
 if [[ -n "$OUTPUT_MSG" ]]; then
-  jq -cn --arg msg "$OUTPUT_MSG" '{"hookSpecificOutput":{"systemMessage":$msg}}'
+  jq -cn --arg msg "$OUTPUT_MSG" '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$msg}}'
 fi
 
 exit 0

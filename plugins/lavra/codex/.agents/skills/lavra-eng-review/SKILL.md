@@ -99,10 +99,10 @@ Parse `model_profile` (default: `"balanced"`). When `model_profile` is `"quality
 
 Run these 4 agents simultaneously, passing the full plan content + retrospective context to each. Also request: (a) one realistic production failure scenario per new codepath (timeout, nil, race condition, etc.) and (b) any work that could be deferred without blocking the core objective:
 
-1. Task architecture-strategist("Review this plan for architectural soundness, scalability, and maintainability. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
-2. Task code-simplicity-reviewer("Review this plan for unnecessary complexity, over-engineering, and opportunities to simplify. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]")
-3. Task security-sentinel("Review this plan for security vulnerabilities, missing auth checks, data exposure risks. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
-4. Task performance-oracle("Review this plan for performance bottlenecks, N+1 queries, missing caching, scalability issues. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
+1. Codex subagent architecture-strategist with ("Review this plan for architectural soundness, scalability, and maintainability. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
+2. Codex subagent code-simplicity-reviewer with ("Review this plan for unnecessary complexity, over-engineering, and opportunities to simplify. For each new codepath, identify one realistic production failure. Flag any work deferrable without blocking the core objective. Plan: [full plan content]. Prior review context: [retrospective findings]")
+3. Codex subagent security-sentinel with ("Review this plan for security vulnerabilities, missing auth checks, data exposure risks. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
+4. Codex subagent performance-oracle with ("Review this plan for performance bottlenecks, N+1 queries, missing caching, scalability issues. For each new codepath, identify one realistic production failure. Plan: [full plan content]. Prior review context: [retrospective findings]") -- add `model: opus` if profile=quality
 
 ### Step 4: Synthesize Findings
 
@@ -178,7 +178,7 @@ Log significant findings:
 bd comments add {EPIC_ID} "LEARNED: Engineering review found: {key insight}"
 ```
 
-**TODOS section:** For each deferrable item surfaced by agents, present as its own AskUserQuestion — never batch, one per question:
+**TODOS section:** For each deferrable item surfaced by agents, present as its own a user question — never batch, one per question:
 
 - **What**: One-line description of the work.
 - **Why**: The concrete problem it solves or value it unlocks.
@@ -198,21 +198,21 @@ Options: **A)** Create a backlog bead **B)** Skip — not valuable enough **C)**
 - Failure modes table produced with CRITICAL GAP flagging
 - NOT in scope section included
 - Completion summary table produced
-- TODOs presented one-per-AskUserQuestion
+- TODOs presented one-per-a user question
 - Critical issues clearly identified
 - Key findings logged as knowledge comments
 </success_criteria>
 
 <handoff>
-After presenting the review, use the **AskUserQuestion tool** to present these options:
+After presenting the review, use the **available Codex user-input interface** to present these options:
 
 **Question:** "Engineering review complete for `{EPIC_ID}`. What would you like to do next?"
 
 **Options:**
 1. **Apply feedback** - Update child beads with review suggestions
-2. **Run `/lavra-research`** - Gather additional evidence with domain-matched agents
-3. **Start `/lavra-work`** - Begin implementing the first child bead
-4. **Run `/lavra-work {EPIC_ID}`** - Work on multiple child beads in parallel
+2. **Run `$lavra-research`** - Gather additional evidence with domain-matched agents
+3. **Start `$lavra-work`** - Begin implementing the first child bead
+4. **Run `$lavra-work {EPIC_ID}`** - Work on multiple child beads in parallel
 5. **Dismiss** - Acknowledge review without changes
 
 ## Applying Feedback (when option 1 is selected)

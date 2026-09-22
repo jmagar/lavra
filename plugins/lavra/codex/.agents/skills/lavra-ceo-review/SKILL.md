@@ -147,7 +147,7 @@ Surface these as questions for the user now, not as "figure it out later."
 
 #### 0F. Mode Selection
 
-Use **AskUserQuestion tool** to present three options:
+Use **available Codex user-input interface** to present three options:
 1. **SCOPE EXPANSION**: The plan is good but could be great. Build the cathedral.
 2. **HOLD SCOPE**: The plan's scope is right. Make it bulletproof.
 3. **SCOPE REDUCTION**: The plan is overbuilt. Propose the minimal version.
@@ -158,7 +158,7 @@ Defaults by context:
 - Refactor → HOLD SCOPE
 - Plan touching >15 files → suggest REDUCTION unless user pushes back
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 ### Phase 3: 10-Section Review
 
@@ -181,7 +181,7 @@ Evaluate and diagram:
 
 Required ASCII diagram: full system architecture showing new components and relationships.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 2: Error & Rescue Map
 
@@ -200,7 +200,7 @@ EXCEPTION CLASS              | RESCUED?  | RESCUE ACTION          | USER SEES
 
 Rules: `rescue StandardError` is ALWAYS a smell. Name specific exceptions. Every rescued error must either retry with backoff, degrade gracefully, or re-raise with added context.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 3: Security & Threat Model
 
@@ -208,7 +208,7 @@ Evaluate: attack surface expansion, input validation, authorization (direct obje
 
 For each finding: threat, likelihood (High/Med/Low), impact (High/Med/Low), and whether the plan mitigates it.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 4: Data Flow & Interaction Edge Cases
 
@@ -223,13 +223,13 @@ INPUT ──▶ VALIDATION ──▶ TRANSFORM ──▶ PERSIST ──▶ OUTPU
 
 For every new user-visible interaction, evaluate: double-click, navigate-away, slow connection, stale state, back button, zero/10k results, background job partial failure.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 5: Code Quality Review
 
 Evaluate: code organization, DRY violations, naming quality, error handling patterns, missing edge cases, over-engineering check, under-engineering check, cyclomatic complexity.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 6: Test Review
 
@@ -239,13 +239,13 @@ For each: type of test, whether a test exists in the plan, happy path test, fail
 
 Test pyramid check. Flakiness risk. Load/stress test requirements.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 7: Performance Review
 
 Evaluate: N+1 queries, memory usage, database indexes, caching opportunities, background job sizing, top 3 slowest new codepaths, connection pool pressure.
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 8: Observability & Debuggability Review
 
@@ -253,7 +253,7 @@ Evaluate: logging (structured, at entry/exit/branch?), metrics (what tells you i
 
 **EXPANSION mode**: What observability would make this feature a joy to operate?
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 9: Deployment & Rollout Review
 
@@ -261,7 +261,7 @@ Evaluate: migration safety, feature flags, rollout order, rollback plan (explici
 
 **EXPANSION mode**: What deploy infrastructure would make shipping this feature routine?
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 #### Section 10: Long-Term Trajectory Review
 
@@ -269,7 +269,7 @@ Evaluate: technical debt introduced, path dependency, knowledge concentration, r
 
 **EXPANSION mode**: What comes after this ships? Does the architecture support that trajectory? Platform potential?
 
-**STOP.** AskUserQuestion once per issue. Do NOT batch. Do NOT proceed until user responds.
+**STOP.** a user question once per issue. Do NOT batch. Do NOT proceed until user responds.
 
 ### Phase 4: Required Outputs
 
@@ -295,7 +295,7 @@ CODEPATH | FAILURE MODE   | RESCUED? | TEST? | USER SEES?     | LOGGED?
 Any row with RESCUED=N, TEST=N, USER SEES=Silent → **CRITICAL GAP**.
 
 #### TODOS protocol
-Present each potential TODO as its own AskUserQuestion. Never batch TODOs — one per question.
+Present each potential TODO as its own a user question. Never batch TODOs — one per question.
 
 For each TODO:
 - **What**: One-line description of the work.
@@ -308,7 +308,7 @@ For each TODO:
 Options: **A)** Create a backlog bead **B)** Skip — not valuable enough **C)** Build it now in this plan.
 
 #### Delight Opportunities (EXPANSION mode only)
-Identify at least 5 "bonus chunk" opportunities (<30 min each). Present each as its own AskUserQuestion. For each: what it is, why it would delight users, effort estimate. Options: **A)** Create a backlog bead **B)** Skip **C)** Build it now.
+Identify at least 5 "bonus chunk" opportunities (<30 min each). Present each as its own a user question. For each: what it is, why it would delight users, effort estimate. Options: **A)** Create a backlog bead **B)** Skip **C)** Build it now.
 
 #### Diagrams (all that apply)
 1. System architecture
@@ -379,18 +379,18 @@ bd comments add {EPIC_ID} "FACT: {critical constraints surfaced}"
 <guardrails>
 - **CEO layer, not engineering layer** — Validate business fit and scope first. lavra-eng-review handles technical depth.
 - **NEVER CODE** — Do not implement anything. Review only.
-- **Stop-per-issue** — One AskUserQuestion per finding with tradeoffs. Never batch issues.
+- **Stop-per-issue** — One a user question per finding with tradeoffs. Never batch issues.
 - **Commit to the mode** — After mode selection, do not silently drift. Raise concerns once in Step 0.
 - **Lead with recommendation** — "Do B. Here's why:" not "Option B might be worth considering."
 </guardrails>
 
 <handoff>
-After presenting the completion summary, use the **AskUserQuestion tool**:
+After presenting the completion summary, use the **available Codex user-input interface**:
 
 **Question:** "CEO review complete for `{EPIC_ID}`. What would you like to do next?"
 
 **Options:**
-1. **Proceed to engineering review** -- invoke Skill("lavra-eng-review") with the epic bead ID for technical depth (architecture, security, performance, simplicity)
+1. **Proceed to engineering review** -- invoke $lavra-eng-review with the epic bead ID for technical depth (architecture, security, performance, simplicity)
 2. **Revise the plan first** -- Update child beads based on review findings before deeper review
 3. **Stop here** -- CEO review findings are sufficient to proceed to implementation
 </handoff>

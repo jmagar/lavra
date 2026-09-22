@@ -127,7 +127,7 @@ If a relevant brainstorm bead found within 14 days: set `BRAINSTORM_ID` and jump
 
 #### Step 0c. Keyword Match — Older (>14 days)
 
-If a semantically matching brainstorm bead exists but is older than 14 days, use **AskUserQuestion tool** to ask:
+If a semantically matching brainstorm bead exists but is older than 14 days, use **available Codex user-input interface** to ask:
 
 "Found brainstorm `{BRAINSTORM_ID}` from [date] that may be relevant: {title}. It's older than 14 days — use it as context for this plan?"
 
@@ -136,7 +136,7 @@ If a semantically matching brainstorm bead exists but is older than 14 days, use
 
 #### Step 0d. No Brainstorm — Run Idea Refinement
 
-If no brainstorm found (or not relevant), refine the idea through collaborative dialogue using the **AskUserQuestion tool**:
+If no brainstorm found (or not relevant), refine the idea through collaborative dialogue using the **available Codex user-input interface**:
 
 - Ask questions one at a time
 - Prefer multiple choice questions when natural options exist
@@ -193,7 +193,7 @@ When any of steps 0a–0c identifies a brainstorm bead:
 - Each child bead's **Context section** MUST include a "Locked decisions from brainstorm:" subsection listing the decisions that apply to that child bead
 
 **If multiple brainstorms could match (step 0b/0c):**
-Use **AskUserQuestion tool** to ask which brainstorm to use, or whether to proceed without one.
+Use **available Codex user-input interface** to ask which brainstorm to use, or whether to proceed without one.
 
 ### 0.5. Read Workflow Config
 
@@ -212,8 +212,8 @@ First, I need to understand the project's conventions, existing patterns, and an
 
 Run in **parallel** to gather local context:
 
-- Task repo-research-analyst(feature_description)
-- Task learnings-researcher(feature_description)
+- Codex subagent repo-research-analyst with (feature_description)
+- Codex subagent learnings-researcher with (feature_description)
 
 **What to look for:**
 - **Repo research:** existing patterns, CLAUDE.md or AGENTS.md guidance, technology familiarity, pattern consistency
@@ -241,8 +241,8 @@ Examples:
 
 Run in parallel:
 
-- Task best-practices-researcher(feature_description)
-- Task framework-docs-researcher(feature_description)
+- Codex subagent best-practices-researcher with (feature_description)
+- Codex subagent framework-docs-researcher with (feature_description)
 
 ### 1.6. Consolidate Research
 
@@ -284,7 +284,7 @@ Think like a product manager - what would make this issue clear and actionable? 
 
 Run SpecFlow Analyzer to validate and refine the feature specification:
 
-- Task spec-flow-analyzer(feature_description, research_findings)
+- Codex subagent spec-flow-analyzer with (feature_description, research_findings)
 
 **SpecFlow Analyzer Output:**
 
@@ -296,7 +296,7 @@ Run SpecFlow Analyzer to validate and refine the feature specification:
 
 Select the bead detail level (simpler is mostly better).
 
-Use **AskUserQuestion tool** to present options:
+Use **available Codex user-input interface** to present options:
 
 #### MINIMAL (Quick Plan)
 
@@ -436,7 +436,7 @@ For beads working in the same domain that don't block each other (e.g., "auth lo
 bd dep relate {BEAD_A} {BEAD_B}
 ```
 
-Creates a bidirectional "see also" link. Related beads have each other's context injected during `/lavra-work` multi-bead execution, improving agent awareness without forcing sequential ordering.
+Creates a bidirectional "see also" link. Related beads have each other's context injected during `$lavra-work` multi-bead execution, improving agent awareness without forcing sequential ordering.
 
 **When to use relate vs dep add:**
 - `bd dep add`: Bead B cannot start until Bead A is done (blocking)
@@ -495,7 +495,7 @@ v PASS: {CHILD_ID} Locked Decisions cover all MUST-CHECK entries for its stack
 -> Proceed to final review, or fix warnings first?
 ```
 
-All checks are **warnings only** — none block submission. For Check 7 warnings (missing MUST-CHECK coverage), the default prompt option is "fix first" rather than "proceed." Use **AskUserQuestion tool** to ask whether to proceed or fix warnings first.
+All checks are **warnings only** — none block submission. For Check 7 warnings (missing MUST-CHECK coverage), the default prompt option is "fix first" rather than "proceed." Use **available Codex user-input interface** to ask whether to proceed or fix warnings first.
 
 ### 6. Final Review & Submission
 
@@ -541,33 +541,33 @@ Address warnings before finalizing the plan.
 - Do create thorough beads like "Implement OAuth2 login flow" with specific test scenarios, validation criteria, and constraints from research
 - Log all research findings to the epic bead with appropriate prefixes
 - Knowledge is auto-captured and available in future sessions
-- Child beads can be worked on independently with `/lavra-work`
+- Child beads can be worked on independently with `$lavra-work`
 - Use `bd ready` to see which child beads are ready
 - Each child bead description complete enough that the implementing agent makes zero judgment calls
 - NEVER CODE! Research and write the plan only.
 </guardrails>
 
 <handoff>
-After creating the epic and child beads, use **AskUserQuestion tool**:
+After creating the epic and child beads, use **available Codex user-input interface**:
 
 **Question:** "Plan ready as epic `{EPIC_ID}`: {title}. What would you like to do next?"
 
 **Options:**
-1. **Run `/lavra-research`** - Gather evidence for each child bead with domain-matched research agents
-2. **Run `/lavra-eng-review`** - Get feedback from reviewers on the plan
-3. **Start `/lavra-work`** - Begin implementing the first child bead
-4. **Run `/lavra-work {EPIC_ID}`** - Work on multiple child beads in parallel
+1. **Run `$lavra-research`** - Gather evidence for each child bead with domain-matched research agents
+2. **Run `$lavra-eng-review`** - Get feedback from reviewers on the plan
+3. **Start `$lavra-work`** - Begin implementing the first child bead
+4. **Run `$lavra-work {EPIC_ID}`** - Work on multiple child beads in parallel
 5. **Simplify** - Reduce detail level
 
 Based on selection:
-- **`/lavra-research`** -> invoke Skill("lavra-research") with the epic bead ID
-- **`/lavra-eng-review`** -> invoke Skill("lavra-eng-review") with the epic bead ID
-- **`/lavra-work`** -> invoke Skill("lavra-work") with the first ready child bead ID
-- **`/lavra-work {EPIC_ID}`** -> invoke Skill("lavra-work") with the epic bead ID
+- **`$lavra-research`** -> invoke $lavra-research with the epic bead ID
+- **`$lavra-eng-review`** -> invoke $lavra-eng-review with the epic bead ID
+- **`$lavra-work`** -> invoke $lavra-work with the first ready child bead ID
+- **`$lavra-work {EPIC_ID}`** -> invoke $lavra-work with the epic bead ID
 - **Simplify** -> Ask "What should I simplify?" then regenerate simpler descriptions
 - **Other** (automatically provided) -> Accept free text for rework or specific changes
 
-**Tip:** If this plan originated from `/lavra-brainstorm`, the brainstorm's locked decisions are already embedded in child bead descriptions.
+**Tip:** If this plan originated from `$lavra-brainstorm`, the brainstorm's locked decisions are already embedded in child bead descriptions.
 
-Loop back to options after Simplify or Other changes until user selects `/lavra-work` or `/lavra-eng-review`.
+Loop back to options after Simplify or Other changes until user selects `$lavra-work` or `$lavra-eng-review`.
 </handoff>
