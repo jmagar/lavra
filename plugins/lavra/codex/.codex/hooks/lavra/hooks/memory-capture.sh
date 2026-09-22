@@ -127,7 +127,7 @@ ENTRY=$(jq -cn \
 [[ -z "$ENTRY" ]] && exit 0
 echo "$ENTRY" | jq . >/dev/null 2>&1 || exit 0
 
-MEMORY_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}/.lavra/memory"
+MEMORY_DIR="$("$SCRIPT_DIR/project-root.sh" "${CLAUDE_PROJECT_DIR:-${CWD:-.}}")/.lavra/memory"
 mkdir -p "$MEMORY_DIR"
 KNOWLEDGE_FILE="$MEMORY_DIR/knowledge.jsonl"
 

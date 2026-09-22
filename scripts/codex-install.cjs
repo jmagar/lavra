@@ -11,7 +11,7 @@ const sourceRoot = path.join(packageRoot, 'plugins/lavra/codex');
 const action = process.argv[2];
 const args = process.argv.slice(3).filter(arg => !['--yes', '-y', '--quiet', '-q', '--no-banner'].includes(arg));
 const global = args.includes('--global');
-const target = global ? os.homedir() : path.resolve(args.find(arg => !arg.startsWith('-')) || os.homedir());
+const target = global ? os.homedir() : path.resolve(args.find(arg => !arg.startsWith('-')) || process.cwd());
 const codexDir = path.join(target, '.codex');
 const manifestPath = path.join(codexDir, 'lavra-install.json');
 const hooksPath = path.join(codexDir, 'hooks.json');
@@ -48,7 +48,7 @@ function ownedFiles() {
     ...walk(path.join(sourceRoot, '.codex/hooks/lavra')).map(file => path.relative(sourceRoot, file)),
   ];
 }
-function loadManifest() { return readJson(manifestPath, {version:1, files:{}, hooks:[], context7:false}); }
+function loadManifest() { return readJson(manifestPath, {version:1, files:{}, hooks:[], hooksFileCreated:false, context7Block:null}); }
 function safeRemove(rel, hash) {
   if (!validOwnedRel(rel)) throw new Error(`Invalid Lavra manifest path: ${rel}`);
   const dest = installedPath(rel);
@@ -63,13 +63,15 @@ function pruneEmpty(rel) {
 }
 function hookEntries() {
   const source = readJson(path.join(sourceRoot, '.codex/hooks.json'), {hooks:{}}).hooks;
+  const scriptByEvent = {SessionStart:'auto-recall.sh', PostToolUse:'memory-capture.sh', SubagentStop:'subagent-wrapup.sh'};
   return Object.entries(source).flatMap(([event, groups]) => groups.flatMap(group => group.hooks.map(hook => ({
     event, matcher: group.matcher || null,
-    hook: {...hook, command: path.join(target, hook.command)},
+    hook: {...hook, command: path.join(target, '.codex/hooks/lavra/hooks', scriptByEvent[event])},
   }))));
 }
 function addHooks(previous) {
   const config = readJson(hooksPath, {hooks:{}});
+  config.hooks ||= {};
   const entries = hookEntries();
   const added = [];
   for (const entry of entries) {
@@ -86,30 +88,32 @@ function addHooks(previous) {
   writeJson(hooksPath, config);
   return added;
 }
-function removeHooks(entries) {
+function removeHooks(entries, fileCreated = false) {
   if (!fs.existsSync(hooksPath)) return;
   const config = readJson(hooksPath, {hooks:{}});
+  config.hooks ||= {};
   for (const entry of entries) {
     const groups = config.hooks[entry.event] || [];
-    for (const group of groups) group.hooks = group.hooks.filter(hook => hook.command !== entry.hook.command);
-    config.hooks[entry.event] = groups.filter(group => group.hooks.length);
+    for (const group of groups) group.hooks = group.hooks.filter(hook => JSON.stringify(hook) !== JSON.stringify(entry.hook));
+    config.hooks[entry.event] = groups.filter(group => group.hooks.length || Object.keys(group).some(key => !['hooks','matcher'].includes(key)));
     if (!config.hooks[entry.event].length) delete config.hooks[entry.event];
   }
-  if (Object.keys(config.hooks).length) writeJson(hooksPath, config);
+  if (Object.keys(config.hooks).length || Object.keys(config).some(key => key !== 'hooks') || !fileCreated) writeJson(hooksPath, config);
   else fs.unlinkSync(hooksPath);
 }
 function installContext7(previous) {
   const existing = fs.existsSync(configPath) ? fs.readFileSync(configPath, 'utf8') : '';
-  if (existing.includes(markerStart)) return previous.context7;
-  if (/^\[mcp_servers\.context7\]/m.test(existing)) return false;
+  if (existing.includes(markerStart)) return previous.context7Block || null;
+  if (/^\[\s*mcp_servers\s*\.\s*context7\s*\]/m.test(existing) || /^context7\s*=/m.test(existing)) return null;
   const block = `${markerStart}\n[mcp_servers.context7]\nurl = "https://mcp.context7.com/mcp"\n${markerEnd}\n`;
   fs.writeFileSync(configPath, existing + (existing && !existing.endsWith('\n') ? '\n' : '') + '\n' + block);
-  return true;
+  return block;
 }
-function removeContext7() {
+function removeContext7(block) {
   if (!fs.existsSync(configPath)) return;
   const existing = fs.readFileSync(configPath, 'utf8');
-  const next = existing.replace(new RegExp(`\\n?${markerStart}[\\s\\S]*?${markerEnd}\\n?`), '\n');
+  if (!existing.includes(block)) return;
+  const next = existing.replace(block, '');
   if (next.trim()) fs.writeFileSync(configPath, next);
   else fs.unlinkSync(configPath);
 }
@@ -120,6 +124,11 @@ function install() {
   for (const file of [manifestPath, hooksPath, configPath]) assertRegularOrMissing(file);
   const previous = loadManifest();
   for (const rel of Object.keys(previous.files)) if (!validOwnedRel(rel)) throw new Error(`Invalid Lavra manifest path: ${rel}`);
+  for (const rel of Object.keys(previous.files)) {
+    const dest = installedPath(rel);
+    assertSafeParents(dest);
+    assertRegularOrMissing(dest);
+  }
   readJson(hooksPath, {hooks:{}});
   const files = ownedFiles();
   const incoming = new Set(files);
@@ -130,19 +139,43 @@ function install() {
     if (pathExists(dest) && (!previous.files[rel] || sha(dest) !== previous.files[rel]))
       throw new Error(`Existing file is not owned by Lavra or was modified: ${dest}`);
   }
-  for (const [rel, hash] of Object.entries(previous.files)) if (!incoming.has(rel)) safeRemove(rel, hash);
-  fs.mkdirSync(codexDir, {recursive:true});
-  const hashes = {};
-  for (const rel of files) {
-    const dest = installedPath(rel);
-    fs.mkdirSync(path.dirname(dest), {recursive:true});
-    fs.copyFileSync(path.join(sourceRoot, rel), dest);
-    hashes[rel] = sha(dest);
-  }
-  removeHooks(previous.hooks);
-  const hooks = addHooks(previous);
-  const context7 = installContext7(previous);
-  writeJson(manifestPath, {version:1, files:hashes, hooks, context7});
+  const hooksFileCreated = previous.hooksFileCreated || !pathExists(hooksPath);
+  const affected = new Set([...files, ...Object.keys(previous.files), '.codex/hooks.json', '.codex/config.toml', '.codex/lavra-install.json']);
+  const originals = new Map([...affected].map(rel => {
+    const file = installedPath(rel);
+    return [rel, pathExists(file) ? {data:fs.readFileSync(file), mode:fs.statSync(file).mode} : null];
+  }));
+  const stage = fs.mkdtempSync(path.join(os.tmpdir(), 'lavra-codex-stage-'));
+  try {
+    for (const rel of files) {
+      const staged = path.join(stage, rel);
+      fs.mkdirSync(path.dirname(staged), {recursive:true});
+      fs.copyFileSync(path.join(sourceRoot, rel), staged);
+    }
+    for (const [rel, hash] of Object.entries(previous.files)) if (!incoming.has(rel)) safeRemove(rel, hash);
+    fs.mkdirSync(codexDir, {recursive:true});
+    const hashes = {};
+    for (const rel of files) {
+      const dest = installedPath(rel);
+      fs.mkdirSync(path.dirname(dest), {recursive:true});
+      fs.copyFileSync(path.join(stage, rel), dest);
+      hashes[rel] = sha(dest);
+    }
+    removeHooks(previous.hooks, previous.hooksFileCreated);
+    const hooks = addHooks(previous);
+    const context7Block = installContext7(previous);
+    writeJson(manifestPath, {version:1, files:hashes, hooks, hooksFileCreated, context7Block});
+  } catch (error) {
+    for (const [rel, original] of originals) {
+      const dest = installedPath(rel);
+      if (original) {
+        fs.mkdirSync(path.dirname(dest), {recursive:true});
+        fs.writeFileSync(dest, original.data);
+        fs.chmodSync(dest, original.mode);
+      } else if (pathExists(dest)) fs.unlinkSync(dest);
+    }
+    throw error;
+  } finally { fs.rmSync(stage, {recursive:true, force:true}); }
   console.log(`Installed Lavra for Codex in ${target} (${files.length} files).`);
 }
 function uninstall() {
@@ -150,8 +183,8 @@ function uninstall() {
   const manifest = loadManifest();
   for (const rel of Object.keys(manifest.files)) if (!validOwnedRel(rel)) throw new Error(`Invalid Lavra manifest path: ${rel}`);
   for (const [rel, hash] of Object.entries(manifest.files)) safeRemove(rel, hash);
-  removeHooks(manifest.hooks);
-  if (manifest.context7) removeContext7();
+  removeHooks(manifest.hooks, manifest.hooksFileCreated);
+  if (manifest.context7Block) removeContext7(manifest.context7Block);
   fs.unlinkSync(manifestPath);
   for (const rel of Object.keys(manifest.files)) pruneEmpty(rel);
   pruneEmpty('.codex/lavra-install.json');

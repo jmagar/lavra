@@ -36,16 +36,34 @@ shutil.copy2(source / 'scripts/import-plan.sh', script_dir / 'import-plan.sh')
 hooks = output / '.codex/hooks.json'
 data = json.loads(hooks.read_text())
 data['hooks'].pop('TeammateIdle', None)
+for group in data['hooks']['SessionStart']:
+    for hook in group['hooks']:
+        hook.pop('async', None)
+for groups in data['hooks'].values():
+    for group in groups:
+        for hook in group['hooks']:
+            script = Path(hook['command']).name
+            hook['command'] = ('bash -c \'exec "$(git rev-parse --show-toplevel)/'
+                               f'.codex/hooks/lavra/hooks/{script}"\'')
 hooks.write_text(json.dumps(data, indent=2) + '\n')
 (output / '.codex/hooks/lavra/hooks/teammate-idle-check.sh').unlink(missing_ok=True)
 shutil.copy2(overlays / 'hooks/subagent-wrapup.sh', output / '.codex/hooks/lavra/hooks/subagent-wrapup.sh')
+shutil.copy2(overlays / 'hooks/project-root.sh', output / '.codex/hooks/lavra/hooks/project-root.sh')
 recall = output / '.codex/hooks/lavra/hooks/auto-recall.sh'
 recall.write_text(recall.read_text().replace(
+    'PROJECT_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}"',
+    'PROJECT_DIR="$("$SCRIPT_DIR/project-root.sh" "${CLAUDE_PROJECT_DIR:-${CWD:-.}}")"',
+).replace(
     '{"hookSpecificOutput":{"systemMessage":$msg}}',
     '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":$msg}}',
 ).replace(
     '{"hookSpecificOutput":{"systemMessage":("## lavra updated ("',
     '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":("## lavra updated ("',
+))
+capture = output / '.codex/hooks/lavra/hooks/memory-capture.sh'
+capture.write_text(capture.read_text().replace(
+    'MEMORY_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}/.lavra/memory"',
+    'MEMORY_DIR="$("$SCRIPT_DIR/project-root.sh" "${CLAUDE_PROJECT_DIR:-${CWD:-.}}")/.lavra/memory"',
 ))
 
 read_only = {'agent-native-reviewer','architecture-strategist','best-practices-researcher',
@@ -67,6 +85,9 @@ for agent in (output / '.codex/agents').glob('*.toml'):
     sandbox = 'read-only' if name in read_only else 'workspace-write'
     content = agent.read_text()
     content = content.replace('Task tool', 'Codex subagent tool')
+    content = content.replace('Task(subagent_type=', 'Codex subagent (type=')
+    content = content.replace('~/.claude/skills', '~/.agents/skills')
+    content = content.replace('.claude/skills', '.agents/skills')
     if name == 'every-style-editor':
         # The source permits edits but forbids shell access. Codex cannot
         # express that exact tool list, so keep this agent in read-only mode.

@@ -31,7 +31,7 @@ fi
 INPUT=$(cat)
 CWD=$(echo "$INPUT" | jq -r '.cwd // empty' 2>/dev/null)
 
-PROJECT_DIR="${CLAUDE_PROJECT_DIR:-${CWD:-.}}"
+PROJECT_DIR="$("$SCRIPT_DIR/project-root.sh" "${CLAUDE_PROJECT_DIR:-${CWD:-.}}")"
 
 # If neither .beads/ nor .lavra/ exists, this project doesn't use lavra
 if [[ ! -d "$PROJECT_DIR/.beads" ]] && [[ ! -d "$PROJECT_DIR/.lavra" ]]; then

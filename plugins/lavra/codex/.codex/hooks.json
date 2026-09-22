@@ -5,8 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".codex/hooks/lavra/hooks/auto-recall.sh",
-            "async": true
+            "command": "bash -c 'exec \"$(git rev-parse --show-toplevel)/.codex/hooks/lavra/hooks/auto-recall.sh\"'"
           }
         ]
       }
@@ -17,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".codex/hooks/lavra/hooks/memory-capture.sh",
+            "command": "bash -c 'exec \"$(git rev-parse --show-toplevel)/.codex/hooks/lavra/hooks/memory-capture.sh\"'",
             "async": true
           }
         ]
@@ -28,7 +27,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".codex/hooks/lavra/hooks/subagent-wrapup.sh"
+            "command": "bash -c 'exec \"$(git rev-parse --show-toplevel)/.codex/hooks/lavra/hooks/subagent-wrapup.sh\"'"
           }
         ]
       }

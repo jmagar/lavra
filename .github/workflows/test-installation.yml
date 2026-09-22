@@ -26,7 +26,7 @@ jobs:
         run: apm run build-codex
       - name: Verify generated files and npm package
         run: |
-          git diff --exit-code -- plugins/lavra/codex
+          test -z "$(git status --porcelain --untracked-files=all -- plugins/lavra/codex)"
           node scripts/test-codex-install.cjs
           node scripts/test-codex-package.cjs
           npm pack --dry-run --json | jq -e '.[0].files | any(.path == "plugins/lavra/codex/.codex/agents/lint.toml")'
