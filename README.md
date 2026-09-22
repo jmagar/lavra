@@ -9,6 +9,7 @@
 A plugin for coding agents that orchestrates the full development lifecycle -- from brainstorming to shipping -- while automatically capturing and recalling knowledge so each unit of work makes the next one easier.
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-cc785c?logo=anthropic&logoColor=white)](https://docs.anthropic.com/en/docs/claude-code)
+[![Codex](https://img.shields.io/badge/Codex-000000?logo=openai&logoColor=white)](https://developers.openai.com/codex)
 [![OpenCode](https://img.shields.io/badge/OpenCode-000000?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiPjxwb2x5bGluZSBwb2ludHM9IjE2IDE4IDIyIDEyIDE2IDYiLz48cG9seWxpbmUgcG9pbnRzPSI4IDYgMiAxMiA4IDE4Ii8+PC9zdmc+&logoColor=white)](https://opencode.ai/)
 [![Gemini CLI](https://img.shields.io/badge/Gemini_CLI-4285F4?logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
 [![Cortex Code](https://img.shields.io/badge/Cortex_Code-29B5E8?logo=snowflake&logoColor=white)](https://www.snowflake.com/en/product/features/cortex-code/)
@@ -102,6 +103,7 @@ cd lavra
 ./install.sh --opencode    # OpenCode
 ./install.sh --gemini      # Gemini CLI
 ./install.sh --cortex      # Cortex Code
+./install.sh --codex       # Codex
 ```
 
 <details>

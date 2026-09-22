@@ -9,6 +9,28 @@ on:
     types: [ published ]
 
 jobs:
+  test-codex:
+    name: Codex APM Build and Installation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install pinned APM
+        run: python -m pip install apm-cli==0.31.0
+      - name: Rebuild Codex artifacts
+        run: apm run build-codex
+      - name: Verify generated files and npm package
+        run: |
+          test -z "$(git status --porcelain --untracked-files=all -- plugins/lavra/codex)"
+          node scripts/test-codex-install.cjs
+          node scripts/test-codex-package.cjs
+          npm pack --dry-run --json | jq -e '.[0].files | any(.path == "plugins/lavra/codex/.codex/agents/lint.toml")'
+
   test-compatibility:
     name: Security & Compatibility Tests
     runs-on: ubuntu-latest
@@ -167,7 +189,7 @@ jobs:
     # When modifying either file, update the other to match.
     name: Verify Release Readiness
     runs-on: ubuntu-latest
-    needs: [test-compatibility, test-installation, test-npx-installer]
+    needs: [test-codex, test-compatibility, test-installation, test-npx-installer]
     if: github.event_name == 'release'
     steps:
       - uses: actions/checkout@v4

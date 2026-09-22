@@ -1,0 +1,13 @@
+name: lavra
+version: 0.7.7
+description: Compound engineering with persistent memory and multi-agent workflows based on beads.
+author: Roberto Mello
+license: MIT
+targets:
+  - codex
+dependencies:
+  apm: []
+  mcp: []
+includes: auto
+scripts:
+  build-codex: bash scripts/build-codex.sh

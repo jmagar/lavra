@@ -1,12 +1,14 @@
 ---
 title: Model Selection
-description: Customize which models Lavra uses per performance tier in OpenCode and Gemini CLI
+description: Model choices and reasoning tiers for Codex, OpenCode, and Gemini CLI
 order: 8
 ---
 
 # Model Selection
 
 Lavra maps its agents to three performance tiers. For OpenCode and Gemini CLI, you can customize which model each tier uses.
+
+For Codex, the generated agent definitions inherit the model selected by the current task. They map source tiers to reasoning effort: haiku to `low`, sonnet to `medium`, and opus to `high`. This avoids pinning a model identifier that may no longer be available. Reviewers use Codex's read-only sandbox; implementation agents use workspace-write. The `every-style-editor` agent is read-only because its Claude tool allowlist cannot be expressed exactly in Codex.
 
 ## Tiers
 

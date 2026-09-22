@@ -1,0 +1,49 @@
+{
+  "SessionStart": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".codex/hooks/lavra/hooks/auto-recall.sh",
+          "async": true
+        }
+      ],
+      "_apm_source": "_local/lavra"
+    }
+  ],
+  "PostToolUse": [
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".codex/hooks/lavra/hooks/memory-capture.sh",
+          "async": true
+        }
+      ],
+      "_apm_source": "_local/lavra"
+    }
+  ],
+  "SubagentStop": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".codex/hooks/lavra/hooks/subagent-wrapup.sh"
+        }
+      ],
+      "_apm_source": "_local/lavra"
+    }
+  ],
+  "TeammateIdle": [
+    {
+      "hooks": [
+        {
+          "type": "command",
+          "command": ".codex/hooks/lavra/hooks/teammate-idle-check.sh"
+        }
+      ],
+      "_apm_source": "_local/lavra"
+    }
+  ]
+}
